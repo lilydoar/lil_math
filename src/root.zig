@@ -1,9 +1,9 @@
-//! Public API surface for lil-math.
+//! Public API surface for lil_math.
 //!
 //! Re-exports all math types under a single namespace so callers can write:
 //!
 //! ```zig
-//! const math = @import("lil-math");
+//! const math = @import("lil_math");
 //! const v: math.Vec3 = ...;
 //! const r: math.Rot3 = ...;
 //! ```

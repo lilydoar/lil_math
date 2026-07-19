@@ -1,4 +1,4 @@
-# lil-math
+# lil_math
 
 A Zig math library for games and simulations.
 
@@ -23,7 +23,7 @@ Add to your `build.zig.zon`:
 
 ```zig
 .lil_math = .{
-    .url = "https://github.com/lilydoar/lil-math/archive/<commit>.tar.gz",
+    .url = "https://github.com/lilydoar/lil_math/archive/<commit>.tar.gz",
     .hash = "<hash>",
 },
 ```
@@ -32,13 +32,13 @@ In `build.zig`:
 
 ```zig
 const lil_math = b.dependency("lil_math", .{});
-exe.root_module.addImport("lil-math", lil_math.module("lil-math"));
+exe.root_module.addImport("lil_math", lil_math.module("lil_math"));
 ```
 
 Then import:
 
 ```zig
-const math = @import("lil-math");
+const math = @import("lil_math");
 const v = math.Vec3.init(.{ 1, 2, 3 });
 ```
 
