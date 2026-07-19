@@ -21,11 +21,8 @@ A Zig math library for games and simulations.
 
 Add to your `build.zig.zon`:
 
-```zig
-.lil_math = .{
-    .url = "https://github.com/lilydoar/lil_math/archive/<commit>.tar.gz",
-    .hash = "<hash>",
-},
+```
+zig fetch --save git+https://github.com/lilydoar/lil-math#<commit>
 ```
 
 In `build.zig`:
