@@ -323,6 +323,9 @@ const Sphere = SphereType(3, f32);
 const Circled = SphereType(2, f64);
 const Sphered = SphereType(3, f64);
 
+/// Tolerance for float-Scalar `Vec.eql` comparisons in tests.
+const test_eps: f32 = @sqrt(math.floatEps(f32));
+
 fn expectApproxScalar(actual: f32, expected: f32) !void {
     if (@abs(actual - expected) > @sqrt(math.floatEps(f32))) return error.TestUnexpectedResult;
 }
@@ -332,9 +335,9 @@ test "Ray: pointAt" {
         Vec3.init(.{ 1, 2, 3 }),
         Vec3.init(.{ 0, 1, 0 }),
     );
-    try std.testing.expect(ray.pointAt(0).eql(Vec3.init(.{ 1, 2, 3 })));
-    try std.testing.expect(ray.pointAt(5).eql(Vec3.init(.{ 1, 7, 3 })));
-    try std.testing.expect(ray.pointAt(-1).eql(Vec3.init(.{ 1, 1, 3 })));
+    try std.testing.expect(ray.pointAt(0).eql(Vec3.init(.{ 1, 2, 3 }), test_eps));
+    try std.testing.expect(ray.pointAt(5).eql(Vec3.init(.{ 1, 7, 3 }), test_eps));
+    try std.testing.expect(ray.pointAt(-1).eql(Vec3.init(.{ 1, 1, 3 }), test_eps));
 }
 
 test "Ray2: pointAt diagonal" {
@@ -342,7 +345,7 @@ test "Ray2: pointAt diagonal" {
         Vec2.zero,
         Vec2.init(.{ 1, 1 }),
     );
-    try std.testing.expect(ray.pointAt(3).eql(Vec2.init(.{ 3, 3 })));
+    try std.testing.expect(ray.pointAt(3).eql(Vec2.init(.{ 3, 3 }), test_eps));
 }
 
 test "Segment: length and midpoint" {
@@ -352,7 +355,7 @@ test "Segment: length and midpoint" {
     );
     try std.testing.expectEqual(@as(f32, 25), seg.lenSqr());
     try std.testing.expectEqual(@as(f32, 5), seg.len());
-    try std.testing.expect(seg.midpoint().eql(Vec3.init(.{ 1.5, 2, 0 })));
+    try std.testing.expect(seg.midpoint().eql(Vec3.init(.{ 1.5, 2, 0 }), test_eps));
 }
 
 test "Segment: dir and toRay" {
@@ -360,11 +363,11 @@ test "Segment: dir and toRay" {
         Vec2.init(.{ 1, 1 }),
         Vec2.init(.{ 4, 5 }),
     );
-    try std.testing.expect(seg.dir().eql(Vec2.init(.{ 3, 4 })));
+    try std.testing.expect(seg.dir().eql(Vec2.init(.{ 3, 4 }), test_eps));
 
     const ray = seg.toRay();
-    try std.testing.expect(ray.origin.eql(seg.a));
-    try std.testing.expect(ray.dir.eql(Vec2.init(.{ 3, 4 })));
+    try std.testing.expect(ray.origin.eql(seg.a, test_eps));
+    try std.testing.expect(ray.dir.eql(Vec2.init(.{ 3, 4 }), test_eps));
 }
 
 test "Segment: closestPoint" {
@@ -374,13 +377,13 @@ test "Segment: closestPoint" {
     );
 
     // Point projects onto middle of segment
-    try std.testing.expect(seg.closestPoint(Vec3.init(.{ 5, 3, 0 })).eql(Vec3.init(.{ 5, 0, 0 })));
+    try std.testing.expect(seg.closestPoint(Vec3.init(.{ 5, 3, 0 })).eql(Vec3.init(.{ 5, 0, 0 }), test_eps));
 
     // Point before start — clamps to a
-    try std.testing.expect(seg.closestPoint(Vec3.init(.{ -5, 1, 0 })).eql(Vec3.init(.{ 0, 0, 0 })));
+    try std.testing.expect(seg.closestPoint(Vec3.init(.{ -5, 1, 0 })).eql(Vec3.init(.{ 0, 0, 0 }), test_eps));
 
     // Point past end — clamps to b
-    try std.testing.expect(seg.closestPoint(Vec3.init(.{ 15, 1, 0 })).eql(Vec3.init(.{ 10, 0, 0 })));
+    try std.testing.expect(seg.closestPoint(Vec3.init(.{ 15, 1, 0 })).eql(Vec3.init(.{ 10, 0, 0 }), test_eps));
 }
 
 test "Aabb: contains" {
@@ -408,36 +411,36 @@ test "Aabb: intersects" {
 
 test "Aabb: center, size, halfSize, volume" {
     const box = Aabb3.init(Vec3.init(.{ -1, 0, 2 }), Vec3.init(.{ 3, 4, 8 }));
-    try std.testing.expect(box.center().eql(Vec3.init(.{ 1, 2, 5 })));
-    try std.testing.expect(box.size().eql(Vec3.init(.{ 4, 4, 6 })));
-    try std.testing.expect(box.halfSize().eql(Vec3.init(.{ 2, 2, 3 })));
+    try std.testing.expect(box.center().eql(Vec3.init(.{ 1, 2, 5 }), test_eps));
+    try std.testing.expect(box.size().eql(Vec3.init(.{ 4, 4, 6 }), test_eps));
+    try std.testing.expect(box.halfSize().eql(Vec3.init(.{ 2, 2, 3 }), test_eps));
     try std.testing.expectEqual(@as(f32, 96), box.volume());
 }
 
 test "Aabb: fromCenterSize" {
     const box = Aabb3.fromCenterSize(Vec3.init(.{ 0, 0, 0 }), Vec3.init(.{ 4, 4, 4 }));
-    try std.testing.expect(box.min.eql(Vec3.init(.{ -2, -2, -2 })));
-    try std.testing.expect(box.max.eql(Vec3.init(.{ 2, 2, 2 })));
+    try std.testing.expect(box.min.eql(Vec3.init(.{ -2, -2, -2 }), test_eps));
+    try std.testing.expect(box.max.eql(Vec3.init(.{ 2, 2, 2 }), test_eps));
 }
 
 test "Aabb: expand and merge" {
     const box = Aabb3.init(Vec3.init(.{ 0, 0, 0 }), Vec3.init(.{ 1, 1, 1 }));
     const expanded = box.expand(Vec3.init(.{ -1, 2, 0.5 }));
-    try std.testing.expect(expanded.min.eql(Vec3.init(.{ -1, 0, 0 })));
-    try std.testing.expect(expanded.max.eql(Vec3.init(.{ 1, 2, 1 })));
+    try std.testing.expect(expanded.min.eql(Vec3.init(.{ -1, 0, 0 }), test_eps));
+    try std.testing.expect(expanded.max.eql(Vec3.init(.{ 1, 2, 1 }), test_eps));
 
     const other = Aabb3.init(Vec3.init(.{ -3, -3, -3 }), Vec3.init(.{ -2, -2, -2 }));
     const merged = box.merge(other);
-    try std.testing.expect(merged.min.eql(Vec3.init(.{ -3, -3, -3 })));
-    try std.testing.expect(merged.max.eql(Vec3.init(.{ 1, 1, 1 })));
+    try std.testing.expect(merged.min.eql(Vec3.init(.{ -3, -3, -3 }), test_eps));
+    try std.testing.expect(merged.max.eql(Vec3.init(.{ 1, 1, 1 }), test_eps));
 }
 
 test "Aabb: closestPoint" {
     const box = Aabb2.init(Vec2.init(.{ 0, 0 }), Vec2.init(.{ 4, 4 }));
     // Inside — returns the point itself
-    try std.testing.expect(box.closestPoint(Vec2.init(.{ 2, 2 })).eql(Vec2.init(.{ 2, 2 })));
+    try std.testing.expect(box.closestPoint(Vec2.init(.{ 2, 2 })).eql(Vec2.init(.{ 2, 2 }), test_eps));
     // Outside — clamps
-    try std.testing.expect(box.closestPoint(Vec2.init(.{ -1, 5 })).eql(Vec2.init(.{ 0, 4 })));
+    try std.testing.expect(box.closestPoint(Vec2.init(.{ -1, 5 })).eql(Vec2.init(.{ 0, 4 }), test_eps));
 }
 
 test "Aabb: intersectsRay hit" {
@@ -514,7 +517,7 @@ test "Sphere: merge contained" {
     const inner = Sphere.init(Vec3.init(.{ 1, 0, 0 }), 2);
     const m = outer.merge(inner);
     // Should return the outer sphere unchanged
-    try std.testing.expect(m.center.eql(outer.center));
+    try std.testing.expect(m.center.eql(outer.center, test_eps));
     try std.testing.expectEqual(m.radius, outer.radius);
 }
 
