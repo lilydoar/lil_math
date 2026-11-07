@@ -22,7 +22,7 @@ A Zig math library for games and simulations.
 Add to your `build.zig.zon`:
 
 ```
-zig fetch --save git+https://github.com/lilydoar/lil-math#<commit>
+zig fetch --save=lil_math git+https://github.com/lilydoar/lil_math#<commit>
 ```
 
 In `build.zig`:
@@ -41,4 +41,4 @@ const v = math.Vec3.init(.{ 1, 2, 3 });
 
 ## Requirements
 
-Zig 0.16.0+
+Zig 0.17.0+
