@@ -54,7 +54,7 @@ pub const Dir2 = enum(u1) {
 
     /// The opposite direction.
     pub fn opposite(self: Dir2) Dir2 {
-        return @enumFromInt(@as(u1, @intFromEnum(self)) +% 1);
+        return @fromBackingInt(@intCast(@as(u1, @backingInt(self)) +% 1));
     }
 };
 
@@ -83,17 +83,17 @@ pub const Dir4 = enum(u2) {
 
     /// The direction facing the opposite way (180° rotation).
     pub fn opposite(self: Dir4) Dir4 {
-        return @enumFromInt(@as(u2, @intFromEnum(self)) +% 2);
+        return @fromBackingInt(@intCast(@as(u2, @backingInt(self)) +% 2));
     }
 
     /// Rotate 90° clockwise (north → east → south → west).
     pub fn cw(self: Dir4) Dir4 {
-        return @enumFromInt(@as(u2, @intFromEnum(self)) +% 1);
+        return @fromBackingInt(@intCast(@as(u2, @backingInt(self)) +% 1));
     }
 
     /// Rotate 90° counter-clockwise (north → west → south → east).
     pub fn ccw(self: Dir4) Dir4 {
-        return @enumFromInt(@as(u2, @intFromEnum(self)) -% 1);
+        return @fromBackingInt(@intCast(@as(u2, @backingInt(self)) -% 1));
     }
 
     /// Relative facing between two Dir4 directions.
@@ -111,23 +111,23 @@ pub const Dir4 = enum(u2) {
 
         /// Reverse the relative direction (cw ↔ ccw, same/opposite unchanged).
         pub fn invert(self: Rel) Rel {
-            return @enumFromInt(@as(u2, 0) -% @intFromEnum(self));
+            return @fromBackingInt(@intCast(@as(u2, 0) -% @backingInt(self)));
         }
     };
 
     /// Compute the relative facing from `self` to `other`.
     pub fn rel(self: Dir4, other: Dir4) Rel {
-        return @enumFromInt(@as(u2, @intFromEnum(other)) -% @intFromEnum(self));
+        return @fromBackingInt(@intCast(@as(u2, @backingInt(other)) -% @backingInt(self)));
     }
 
     /// Embed into `Dir6` as a horizontal direction (Y=0 plane in 3D).
     pub fn toDir6(self: Dir4) Dir6 {
-        return @enumFromInt(@as(u3, @intFromEnum(self)));
+        return @fromBackingInt(@intCast(@as(u3, @backingInt(self))));
     }
 
     /// Embed into `Dir8` as a cardinal direction.
     pub fn toDir8(self: Dir4) Dir8 {
-        return @enumFromInt(@as(u3, @intFromEnum(self)) << 1);
+        return @fromBackingInt(@intCast(@as(u3, @backingInt(self)) << 1));
     }
 };
 
@@ -173,17 +173,17 @@ pub const Dir8 = enum(u3) {
 
     /// The direction facing the opposite way (180° rotation).
     pub fn opposite(self: Dir8) Dir8 {
-        return @enumFromInt(@as(u3, @intFromEnum(self)) +% 4);
+        return @fromBackingInt(@intCast(@as(u3, @backingInt(self)) +% 4));
     }
 
     /// Rotate 45° clockwise.
     pub fn cw(self: Dir8) Dir8 {
-        return @enumFromInt(@as(u3, @intFromEnum(self)) +% 1);
+        return @fromBackingInt(@intCast(@as(u3, @backingInt(self)) +% 1));
     }
 
     /// Rotate 45° counter-clockwise.
     pub fn ccw(self: Dir8) Dir8 {
-        return @enumFromInt(@as(u3, @intFromEnum(self)) -% 1);
+        return @fromBackingInt(@intCast(@as(u3, @backingInt(self)) -% 1));
     }
 
     /// Relative facing between two Dir8 directions.
@@ -209,42 +209,42 @@ pub const Dir8 = enum(u3) {
 
         /// Reverse the relative direction.
         pub fn invert(self: Rel) Rel {
-            return @enumFromInt(@as(u3, 0) -% @intFromEnum(self));
+            return @fromBackingInt(@intCast(@as(u3, 0) -% @backingInt(self)));
         }
 
         /// True if the relative turn is strictly clockwise (excludes same/opposite).
         pub fn isCw(self: Rel) bool {
-            const v = @intFromEnum(self);
+            const v = @backingInt(self);
             return v >= 1 and v <= 3;
         }
 
         /// True if the relative turn is strictly counter-clockwise (excludes same/opposite).
         pub fn isCcw(self: Rel) bool {
-            const v = @intFromEnum(self);
+            const v = @backingInt(self);
             return v >= 5 and v <= 7;
         }
     };
 
     /// Compute the relative facing from `self` to `other`.
     pub fn rel(self: Dir8, other: Dir8) Rel {
-        return @enumFromInt(@as(u3, @intFromEnum(other)) -% @intFromEnum(self));
+        return @fromBackingInt(@intCast(@as(u3, @backingInt(other)) -% @backingInt(self)));
     }
 
     /// True for axis-aligned directions (N, E, S, W).
     pub fn isCardinal(self: Dir8) bool {
-        return @intFromEnum(self) & 1 == 0;
+        return @backingInt(self) & 1 == 0;
     }
 
     /// True for diagonal directions (NE, SE, SW, NW).
     pub fn isDiagonal(self: Dir8) bool {
-        return @intFromEnum(self) & 1 == 1;
+        return @backingInt(self) & 1 == 1;
     }
 
     /// Convert to `Dir4` if this is a cardinal direction, otherwise `null`.
     pub fn toDir4(self: Dir8) ?Dir4 {
-        const v = @intFromEnum(self);
+        const v = @backingInt(self);
         if (v & 1 != 0) return null;
-        return @enumFromInt(@as(u2, @intCast(v >> 1)));
+        return @fromBackingInt(@intCast(@as(u2, @intCast(v >> 1))));
     }
 };
 
@@ -316,24 +316,24 @@ pub const Dir6 = enum(u3) {
 
     /// True for horizontal directions (N/E/S/W).
     pub fn isHorizontal(self: Dir6) bool {
-        return @intFromEnum(self) < 4;
+        return @backingInt(self) < 4;
     }
 
     /// True for vertical directions (Up/Down).
     pub fn isVertical(self: Dir6) bool {
-        return @intFromEnum(self) >= 4;
+        return @backingInt(self) >= 4;
     }
 
     /// Convert to `Dir4` if this is a horizontal direction, otherwise `null`.
     pub fn toDir4(self: Dir6) ?Dir4 {
-        const v = @intFromEnum(self);
+        const v = @backingInt(self);
         if (v >= 4) return null;
-        return @enumFromInt(@as(u2, @intCast(v)));
+        return @fromBackingInt(@intCast(@as(u2, @intCast(v))));
     }
 
     /// Embed into `Dir26` as a face direction.
     pub fn toDir26(self: Dir6) Dir26 {
-        return @enumFromInt(@as(u5, @intFromEnum(self)));
+        return @fromBackingInt(@intCast(@as(u5, @backingInt(self))));
     }
 };
 
@@ -386,7 +386,7 @@ pub const Dir26 = enum(u5) {
     /// All 26 directions in enum order.
     pub const all: [26]Dir26 = blk: {
         var dirs: [26]Dir26 = undefined;
-        for (0..26) |i| dirs[i] = @enumFromInt(i);
+        for (0..26) |i| dirs[i] = @fromBackingInt(@intCast(i));
         break :blk dirs;
     };
 
@@ -437,7 +437,7 @@ pub const Dir26 = enum(u5) {
 
     /// Whether this is a face (6), edge (12), or vertex (8) direction.
     pub fn kind(self: Dir26) Kind {
-        const v = @intFromEnum(self);
+        const v = @backingInt(self);
         if (v < 6) return .face;
         if (v < 18) return .edge;
         return .vertex;
@@ -445,9 +445,9 @@ pub const Dir26 = enum(u5) {
 
     /// Convert to `Dir6` if this is a face direction, otherwise `null`.
     pub fn toDir6(self: Dir26) ?Dir6 {
-        const v = @intFromEnum(self);
+        const v = @backingInt(self);
         if (v >= 6) return null;
-        return @enumFromInt(@as(u3, @intCast(v)));
+        return @fromBackingInt(@intCast(@as(u3, @intCast(v))));
     }
 
     /// Look up a Dir26 from a 3D offset.
@@ -470,7 +470,7 @@ pub const Dir26 = enum(u5) {
     }
 
     const offset_lut: [27]?Dir26 = blk: {
-        var lut: [27]?Dir26 = .{null} ** 27;
+        var lut: [27]?Dir26 = @splat(null);
         for (all) |d| {
             const f = d.forward();
             const ux: usize = @intCast(f.v[0] + 1);
@@ -492,14 +492,14 @@ pub const Dir26 = enum(u5) {
 ///
 /// Requires a contiguous enum with values `0..N-1`.
 pub fn DirSetType(comptime Dir: type) type {
-    const fields = @typeInfo(Dir).@"enum".fields;
-    const n = fields.len;
-    const Bits = std.meta.Int(.unsigned, n);
+    const info = @typeInfo(Dir).@"enum";
+    const n = info.field_names.len;
+    const Bits = @Int(.unsigned, n);
     const ShiftAmt = std.math.Log2Int(Bits);
 
     comptime {
-        for (fields, 0..) |field, i| {
-            if (field.value != i)
+        for (info.field_values, 0..) |value, i| {
+            if (value != i)
                 @compileError("DirSetType requires contiguous enum values starting from 0");
         }
     }
@@ -517,7 +517,7 @@ pub fn DirSetType(comptime Dir: type) type {
 
         /// A set containing a single direction.
         pub fn of(dir: Dir) Self {
-            return .{ .bits = @as(Bits, 1) << @as(ShiftAmt, @intCast(@intFromEnum(dir))) };
+            return .{ .bits = @as(Bits, 1) << @as(ShiftAmt, @intCast(@backingInt(dir))) };
         }
 
         /// True if the set contains `dir`.
@@ -602,7 +602,7 @@ pub fn DirSetType(comptime Dir: type) type {
                 if (it.bits == 0) return null;
                 const idx: ShiftAmt = @intCast(@ctz(it.bits));
                 it.bits &= it.bits - 1;
-                return @enumFromInt(idx);
+                return @fromBackingInt(@intCast(idx));
             }
         };
     };
@@ -649,17 +649,17 @@ pub const Ori24 = struct {
 
     /// Which direction the local forward axis (+Z) points in world space.
     pub fn facing(self: Ori24) Dir6 {
-        return @enumFromInt(facing_lut[self._val]);
+        return @fromBackingInt(@intCast(facing_lut[self._val]));
     }
 
     /// Which direction the local up axis (+Y) points in world space.
     pub fn up(self: Ori24) Dir6 {
-        return @enumFromInt(up_lut[self._val]);
+        return @fromBackingInt(@intCast(up_lut[self._val]));
     }
 
     /// Which direction the local right axis (+X) points in world space.
     pub fn right(self: Ori24) Dir6 {
-        return @enumFromInt(right_lut[self._val]);
+        return @fromBackingInt(@intCast(right_lut[self._val]));
     }
 
     /// The spin component: CW rotation (0–3) around the facing axis.
@@ -685,19 +685,19 @@ pub const Ori24 = struct {
     ///
     /// Maps a local-frame direction to the corresponding world-frame direction.
     pub fn apply(self: Ori24, dir: Dir6) Dir6 {
-        return @enumFromInt(apply_lut[self._val][@intFromEnum(dir)]);
+        return @fromBackingInt(@intCast(apply_lut[self._val][@backingInt(dir)]));
     }
 
     /// Construct from facing direction with canonical up (spin 0).
     pub fn fromFacing(forward: Dir6) Ori24 {
-        return .{ ._val = @as(u5, @intFromEnum(forward)) * 4 };
+        return .{ ._val = @as(u5, @backingInt(forward)) * 4 };
     }
 
     /// Construct from facing and up directions.
     ///
     /// Returns `null` if `forward` and `up_dir` are not perpendicular.
     pub fn fromAxes(forward: Dir6, up_dir: Dir6) ?Ori24 {
-        const val = from_axes_lut[@intFromEnum(forward)][@intFromEnum(up_dir)];
+        const val = from_axes_lut[@backingInt(forward)][@backingInt(up_dir)];
         if (val == 0xFF) return null;
         return .{ ._val = @intCast(val) };
     }
@@ -863,7 +863,7 @@ pub const Ori24 = struct {
     };
 
     const from_axes_lut: [6][6]u8 = blk: {
-        var lut: [6][6]u8 = .{.{0xFF} ** 6} ** 6;
+        var lut: [6][6]u8 = @splat(@splat(0xFF));
         for (0..24) |i| {
             lut[facing_lut[i]][up_lut[i]] = @intCast(i);
         }
@@ -1045,7 +1045,7 @@ test "Dir26 opposite round-trip" {
 }
 
 test "Dir26 all offsets are unique and non-zero" {
-    var seen = [_]bool{false} ** 27;
+    var seen: [27]bool = @splat(false);
     for (Dir26.all) |d| {
         const f = d.forward();
         const ux: usize = @intCast(f.v[0] + 1);
@@ -1274,7 +1274,7 @@ test "Ori24 inverse" {
 }
 
 test "Ori24 all 24 are distinct" {
-    var seen = [_]bool{false} ** 24;
+    var seen: [24]bool = @splat(false);
     for (Ori24.all) |o| {
         try testing.expect(!seen[o._val]);
         seen[o._val] = true;

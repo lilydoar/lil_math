@@ -249,11 +249,11 @@ pub fn MatType(comptime n: comptime_int, comptime Scalar: type) type {
         m: [n]ColVec,
 
         /// The zero matrix (all elements zero).
-        pub const zero = Self{ .m = .{@as(ColVec, @splat(0))} ** n };
+        pub const zero = Self{ .m = @splat(@as(ColVec, @splat(0))) };
 
         /// The identity matrix.
         pub const identity = id: {
-            var m: [n]ColVec = .{@as(ColVec, @splat(0))} ** n;
+            var m: [n]ColVec = @splat(@as(ColVec, @splat(0)));
             for (0..n) |i| {
                 m[i] = @splat(0);
                 m[i][i] = 1;
